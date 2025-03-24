@@ -9,8 +9,7 @@
   </head>
   <body>
     <div class="grade-container">
-      <div id="escurecer"></div>
-      <div class="presente">
+      <div class="presente" style="display: none">
         <div class="caixa">
           <div class="fita"></div>
         </div>
@@ -24,7 +23,6 @@
             <div class="fita"></div>
           </div>
         </div>
-        <div id="mensagem"></div>
       </div>
 
       <div id="perguntas">
@@ -57,11 +55,20 @@
             />
             <span id="labelC"></span>
           </label>
+          <label>
+            <input
+              type="radio"
+              name="alternativa"
+              id="alternativaD"
+              value="d"
+            />
+            <span id="labelD"></span>
+          </label>
         </div>
         <div id="cronometro">00:00:00</div>
         <button id="enviarResposta">Enviar Resposta</button>
       </div>
-      <div class="item inicio"></div>
+      <div class="item inicio"><strong>INICIO</strong></div>
       <div class="item od1">
         <img src="./img/casa2.png" alt="Objetivo 1" />
       </div>
@@ -71,17 +78,26 @@
       <div class="item od3">
         <img src="./img/casa4.png" alt="Objetivo 3" />
       </div>
+      <div class="item agenda20301">
+        <img src="./img/agenda 2030.png" alt="Agenda 20301" />
+      </div>
       <div class="item od4">
         <img src="./img/casa5.png" alt="Objetivo 4" />
       </div>
       <div class="item od5">
         <img src="./img/casa6.png" alt="Objetivo 5" />
       </div>
+      <div class="item coringa1">
+        <img src="./img/ods.png" alt="Coringa 1" />
+      </div>
       <div class="item od6">
         <img src="./img/casa8.png" alt="Objetivo 6" />
       </div>
       <div class="item od7">
         <img src="./img/casa9.png" alt="Objetivo 7" />
+      </div>
+      <div class="item agenda20302">
+        <img src="./img/agenda 2030.png" alt="Agenda 20302" />
       </div>
       <div class="item od8">
         <img src="./img/casa10.png" alt="Objetivo 8" />
@@ -92,6 +108,9 @@
       <div class="item od10">
         <img src="./img/casa13.png" alt="Objetivo 10" />
       </div>
+      <div class="item coringa2">
+        <img src="./img/ods.png" alt="Coringa 2" />
+      </div>
       <div class="item od11">
         <img src="./img/casa14.png" alt="Objetivo 11" />
       </div>
@@ -100,6 +119,9 @@
       </div>
       <div class="item od13">
         <img src="./img/casa17.png" alt="Objetivo 13" />
+      </div>
+      <div class="item agenda20303">
+        <img src="./img/agenda 2030.png" alt="Agenda 20303" />
       </div>
       <div class="item od14">
         <img src="./img/casa18.png" alt="Objetivo 14" />
@@ -110,28 +132,13 @@
       <div class="item od16">
         <img src="./img/casa20.png" alt="Objetivo 16" />
       </div>
+      <div class="item coringa3">
+        <img src="./img/ods.png" alt="Coringa 3" />
+      </div>
       <div class="item od17">
         <img src="./img/casa21.png" alt="Objetivo 17" />
       </div>
       <div class="item fim"><img src="./img/casa22.png" alt="Fim" /></div>
-      <div class="item coringa1">
-        <img src="./img/ods.png" alt="Coringa 1" />
-      </div>
-      <div class="item coringa2">
-        <img src="./img/ods.png" alt="Coringa 2" />
-      </div>
-      <div class="item coringa3">
-        <img src="./img/ods.png" alt="Coringa 3" />
-      </div>
-      <div class="item agenda20301">
-        <img src="./img/agenda 2030.png" alt="Agenda 20301" />
-      </div>
-      <div class="item agenda20302">
-        <img src="./img/agenda 2030.png" alt="Agenda 20302" />
-      </div>
-      <div class="item agenda20303">
-        <img src="./img/agenda 2030.png" alt="Agenda 20303" />
-      </div>
       <div class="tela-jogo" id="quadrado">
         <div id="container-dado" class="container-dado">
           <div id="cubo" class="cubo">
@@ -164,7 +171,7 @@
       <div class="pawn blue">
         <div class="item head"></div>
         <div class="item body"></div>
-        <div class="item base" id="username2">Jogador 2</div>
+        <div class="item base" id="username2">Robô</div>
       </div>
       <div class="pawn green">
         <div class="item head"></div>
@@ -177,6 +184,10 @@
         <div class="item base" id="username4">Jogador 4</div>
       </div>
     </div>
+    >
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+    <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
     <script type="module" src="./js/jogo.js"></script>
+    <script src="./js/perguntas.js"></script>
   </body>
 </html>

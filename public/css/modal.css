@@ -1,0 +1,274 @@
+/* Overlay do Modal */
+.modalOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  backdrop-filter: blur(5px);
+}
+
+/* Conteúdo do Modal */
+.modalContent {
+  background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+  border: none;
+  color: white;
+  padding: 2rem;
+  border-radius: 1rem;
+  max-width: 100vh;
+  width: 1000px; /* Aumentei a largura para acomodar 3 colunas */
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Título */
+.title {
+  font-size: 1.75rem;
+  font-weight: bold;
+  text-align: center;
+  color: #f8fafc;
+  margin-bottom: 1.5rem;
+}
+
+/* Container Principal */
+.mainContainer {
+  display: flex;
+  gap: 2rem;
+}
+
+/* Coluna 1: Opções de Jogo */
+.leftSide {
+  flex: 1;
+}
+
+.optionLabel {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  background-color: rgba(255, 255, 255, 0.1);
+  padding: 1rem;
+  border-radius: 0.75rem;
+  cursor: pointer;
+  margin-bottom: 1rem;
+  transition: background-color 0.2s;
+}
+
+.optionLabel:hover {
+  background-color: rgba(255, 255, 255, 0.15);
+}
+
+.checkbox {
+  width: 1.25rem;
+  height: 1.25rem;
+  border: 2px solid #f8fafc;
+  background-color: transparent;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.checkbox:checked {
+  background-color: #f8fafc;
+  position: relative;
+}
+
+.checkbox:checked::after {
+  content: "✓";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: #4f46e5;
+  font-size: 0.875rem;
+}
+
+/* Coluna 2: Configurações Dinâmicas */
+.middleSide {
+  flex: 2;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.settings-content {
+  width: 100%;
+}
+
+.settings-content.hidden {
+  display: none;
+}
+
+/* Botão "Criar Sala" */
+.createRoomButton {
+  background-color: #4f46e5;
+  color: white;
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 0.5rem;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.2s, transform 0.2s;
+  width: 100%;
+}
+
+.createRoomButton:hover {
+  background-color: #4338ca;
+  transform: translateY(-2px);
+}
+
+/* Imagem Inicial */
+.image {
+  max-width: 100%;
+  border-radius: 0.5rem;
+  transition: transform 0.3s ease;
+}
+
+.image:hover {
+  transform: scale(1.05);
+}
+
+/* Seção do Código da Sala */
+.roomCode {
+  font-size: 2.25rem;
+  font-weight: bold;
+  margin-bottom: 1rem;
+  color: #f8fafc;
+  background-color: rgba(255, 255, 255, 0.1);
+  padding: 0.5rem;
+  border-radius: 0.5rem;
+}
+
+/* Campo de Entrada e Botão "Entrar" */
+.joinSection {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.codeInput {
+  padding: 0.75rem;
+  border: 2px solid #4f46e5;
+  border-radius: 0.5rem;
+  background-color: rgba(255, 255, 255, 0.1);
+  color: white;
+  font-size: 1rem;
+  outline: none;
+  transition: border-color 0.2s;
+  width: 100%;
+}
+
+.codeInput:focus {
+  border-color: #818cf8;
+}
+
+.codeInput::placeholder {
+  color: #9ca3af;
+}
+
+.joinButton {
+  background-color: #4f46e5;
+  color: white;
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 0.5rem;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.2s, transform 0.2s;
+}
+
+.joinButton:hover {
+  background-color: #4338ca;
+  transform: translateY(-2px);
+}
+
+/* Texto "OU" centralizado */
+.ou-text {
+  text-align: center;
+  font-size: 1.25rem;
+  margin: 1rem 0;
+  color: #f8fafc;
+}
+
+/* Coluna 3: Lista de Jogadores (Sala) */
+.rightSide {
+  flex: 1;
+  border-radius: 0.75rem;
+  padding: 1rem;
+  color: #f8fafc;
+}
+
+.rightSide h3 {
+  font-size: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+.rightSide ul {
+  list-style: none;
+  padding: 0;
+}
+
+.rightSide ul li {
+  margin-bottom: 0.5rem;
+  background-color: rgba(255, 255, 255, 0.05);
+  padding: 0.5rem;
+  border-radius: 0.5rem;
+}
+
+/* Rodapé do Modal (Botões "Iniciar" e "Fechar") */
+.modalFooter {
+  display: flex;
+  justify-content: center; /* Centraliza os botões */
+  gap: 1rem;
+  margin-top: 1.5rem;
+  width: 100%;
+}
+
+.startButton,
+.closeButton {
+  background-color: #4f46e5;
+  color: white;
+  padding: 0.5rem 1rem; /* Padding reduzido */
+  border: none;
+  border-radius: 0.75rem;
+  font-size: 0.9rem; /* Tamanho da fonte reduzido */
+  cursor: pointer;
+  transition: background-color 0.2s, transform 0.2s;
+  width: 0px; /* Largura fixa menor */
+  flex: none; /* Impede que os botões se expandam */
+}
+
+.startButton {
+  background-color: #10b981;
+}
+
+.startButton:hover {
+  background-color: #059669;
+  transform: translateY(-2px);
+}
+
+.closeButton:hover {
+  background-color: #4338ca;
+  transform: translateY(-2px);
+}
+/* Classe para ocultar elementos */
+.hidden {
+  display: none;
+}

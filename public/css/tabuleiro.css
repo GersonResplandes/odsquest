@@ -29,7 +29,13 @@ body {
   border-radius: 12px;
   padding: 20px;
 }
-
+strong {
+  display: block; /* Transforma em bloco para centralização */
+  text-align: center; /* Centraliza o texto */
+  font-size: 1.2em; /* Aumenta o tamanho em 20% */
+  color: black;
+  margin: 10px 0; /* Adiciona espaço vertical */
+}
 .item {
   display: flex;
   align-items: center;
@@ -127,7 +133,7 @@ body {
 .pawn.red,
 .pawn.blue,
 .pawn.green,
-.pawn.yellow{
+.pawn.yellow {
   grid-column: 1;
   grid-row: 1;
 }
@@ -146,7 +152,13 @@ body {
   left: 205%;
 }
 .inicio {
+  justify-content: center; /* Centraliza horizontalmente */
+  align-items: center; /* Centraliza verticalmente (se tiver altura) */
+  font-size: 24px; /* Tamanho fixo */
+  font-weight: bold;
   background-color: white;
+  text-align: center;
+  padding: 15px;
   grid-column: 1 / 4;
   grid-row: 1;
 }
@@ -387,7 +399,7 @@ input[type="radio"] {
 #enviarResposta:hover {
   background-color: #004d99; /* Tom mais escuro no hover */
 }
-#escurecer {
+/* #escurecer {
   position: fixed;
   top: 0;
   left: 0;
@@ -396,7 +408,7 @@ input[type="radio"] {
   background-color: rgba(35, 29, 29, 0.863);
   z-index: 2;
   display: none;
-}
+} */
 #modalCoringa {
   display: none;
   position: fixed;
@@ -504,7 +516,7 @@ input[type="radio"] {
     display: flex;
     gap: 80px;
   }
-  
+
   .pawn {
     position: relative;
     width: 50px;
@@ -512,7 +524,7 @@ input[type="radio"] {
     margin: auto;
     text-align: center;
   }
-  
+
   /* Base do peão */
   .base {
     width: 35px;
@@ -522,7 +534,7 @@ input[type="radio"] {
     left: 10px;
     font-size: 5px;
   }
-  
+
   /* Corpo do peão */
   .body {
     width: 20px;
@@ -530,7 +542,7 @@ input[type="radio"] {
     bottom: 40px;
     left: 17px;
   }
-  
+
   /* Cabeça do peão */
   .head {
     width: 10px;
@@ -544,28 +556,95 @@ input[type="radio"] {
     margin-left: 30px;
     backface-visibility: hidden;
   }
-  
+
   .face1 {
     transform: rotateY(0deg) translateZ(25px);
   }
-  
+
   .face2 {
     transform: rotateY(90deg) translateZ(25px);
   }
-  
+
   .face3 {
     transform: rotateY(180deg) translateZ(25px);
   }
-  
+
   .face4 {
     transform: rotateY(-90deg) translateZ(25px);
   }
-  
+
   .face5 {
     transform: rotateX(90deg) translateZ(25px);
   }
-  
+
   .face6 {
     transform: rotateX(-90deg) translateZ(25px);
   }
+}
+.bloqueado {
+  pointer-events: none;
+}
+.presente {
+  width: 300px;
+  height: 300px;
+  position: relative;
+  display: flex;
+  flex-direction: column-reverse;
+  align-items: center;
+}
+
+.caixa {
+  width: 180px;
+  height: 120px;
+  background: crimson;
+
+  display: flex;
+  justify-content: center;
+
+  border-radius: 0 0 10px 10px;
+}
+
+.caixa > .fita {
+  width: 60px;
+  height: 100%;
+}
+
+.fita {
+  background: gold;
+}
+
+.topo {
+  width: 200px;
+  height: 60px;
+  background: crimson;
+  border-radius: 10px;
+
+  display: flex;
+  justify-content: center;
+
+  filter: drop-shadow(0 2px 3px);
+}
+
+.topo .fita {
+  width: 80px;
+  height: 100%;
+}
+
+.laco {
+  display: flex;
+  justify-content: center;
+}
+
+.volta {
+  border: 10px solid goldenrod;
+  width: 80px;
+  height: 40px;
+  border-radius: 50% / 100% 50% 50% 0;
+}
+
+.volta.esq {
+  transform: rotateY(180deg);
+}
+.container {
+  transition: 0.3s ease;
 }

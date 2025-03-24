@@ -1,19 +1,18 @@
 (() => {
+  // Seletores e variáveis
   const botaoMenu = document.getElementById("menu-icon");
   const linksNavegacao = document.getElementById("nav-links");
   const botaoIniciar = document.getElementById("btn-iniciar");
   const botaoRegras = document.getElementById("btn-regras");
-  const botaoConfiguracao = document.getElementById("btn-configuracao");
   const modalConfiguracoes = document.getElementById("game-settings-modal");
   const botaoModoSolo = document.getElementById("solo");
   const botaoModoRobo = document.getElementById("robot");
   const botaoModoAmigos = document.getElementById("amigos");
+  const robot = document.getElementById("robot");
+  const solo = document.getElementById("solo");
   const botaoFechar = document.getElementById("close-settings");
-  const botaoEntraSala = document.getElementById("join-room-btn");
-  const botaoCriarSala = document.getElementById("create-room-btn");
-  const codigoSala = document.getElementById("codigo-sala");
-  const campoCodigo = document.getElementById("campo-codigo");
   const entarSala = document.getElementById("entarSala");
+  const listaJogadores = document.getElementById("jogadores-lista");
   const criarConta = document.getElementById("criar-conta");
   const perfil = document.getElementById("perfil");
   const profileContainer = document.querySelector(".profile-container");
@@ -30,9 +29,15 @@
     ".alternar-container-apelido"
   );
   const alternarContainer = document.querySelector(".alternar-container");
-  const butaoFecharPerfio = document.getElementById("close-profile");
-  const butaoFecharLogin = document.getElementById("close-login");
+  const initialImage = document.getElementById("initial-image");
+  const joinRoomSection = document.getElementById("join-room-section");
+  const voltarLogin = document.getElementById("voltarLogin");
+  const closeProfile = document.getElementById("close-profile");
+  const article = document.getElementById("conteiner");
+  const startGameBtn = document.getElementById("start-game-btn");
   let Login = true;
+
+  // Lógica da roleta (se necessário)
   const containerRoleta = document.getElementById("roleta");
   const largura = window.innerWidth;
   let raioRoleta;
@@ -45,7 +50,6 @@
   }
 
   const numeroDeCasas = 17;
-
   const imagensCasas = [
     "./img/casa2.png",
     "./img/casa3.png",
@@ -90,129 +94,166 @@
       casa.style.transform = `rotate(${angulo}deg) translate(${raioRoleta}px)`;
     });
   }, 500);
+
+  // Eventos de clique
   botaoMenu.addEventListener("click", () => {
     linksNavegacao.classList.toggle("active");
   });
 
   botaoIniciar.addEventListener("click", () => {
-    window.location.href = "../tabuleiro.html";
+    modalConfiguracoes.classList.remove("hidden");
   });
-
   botaoRegras.addEventListener("click", () => {
     alert("Em breve");
   });
 
-  botaoConfiguracao.addEventListener("click", () => {
-    modalConfiguracoes.classList.remove("hidden");
-  });
   botaoFechar.addEventListener("click", () => {
     modalConfiguracoes.classList.add("hidden");
   });
 
   perfil.addEventListener("click", () => {
     profileContainer.style.display = "flex";
+    article.style.display = "none";
   });
-  butaoFecharPerfio.addEventListener("click", () => {
+  closeProfile.addEventListener("click", () => {
     profileContainer.style.display = "none";
   });
-  butaoFecharLogin.addEventListener("click", () => {
-    containerLogin.style.display = "none";
-  });
-  botaoEntraSala.classList.add("hidden");
-  botaoCriarSala.classList.add("hidden");
-  codigoSala.classList.add("hidden");
-  campoCodigo.classList.add("hidden");
-  entarSala.classList.add("hidden");
 
-  botaoModoAmigos.addEventListener("change", () => {
-    if (botaoModoAmigos.checked) {
-      botaoModoSolo.checked = false;
-      botaoModoRobo.checked = false;
-      botaoModoSolo.disabled = true;
-      botaoModoRobo.disabled = true;
-      botaoEntraSala.classList.remove("hidden");
-      botaoCriarSala.classList.remove("hidden");
-    } else {
-      botaoModoSolo.disabled = false;
-      botaoModoRobo.disabled = false;
-      botaoEntraSala.classList.add("hidden");
-      botaoCriarSala.classList.add("hidden");
-      campoCodigo.classList.add("hidden");
-      entarSala.classList.add("hidden");
+  // Primeiro, obtenha os elementos corretamente
+  const soloCheckbox = document.getElementById("solo");
+  const robotCheckbox = document.getElementById("robot");
+  const amigosCheckbox = document.getElementById("amigos");
+
+  const soloSettings = document.getElementById("solo-settings");
+  const robotSettings = document.getElementById("robot-settings");
+  const amigosSettings = document.getElementById("amigos-settings");
+
+  // Lógica para exibir/ocultar configurações conforme o modo selecionado
+  amigosCheckbox.addEventListener("change", () => {
+    if (amigosCheckbox.checked) {
+      // Desmarca os outros checkboxes
+      soloCheckbox.checked = false;
+      robotCheckbox.checked = false;
+
+      // Mostra apenas as configurações de amigos
+      amigosSettings.classList.remove("hidden");
+      soloSettings.classList.add("hidden");
+      robotSettings.classList.add("hidden");
     }
   });
 
-  botaoModoSolo.addEventListener("change", () => {
-    if (botaoModoSolo.checked || botaoModoRobo.checked) {
-      botaoModoAmigos.checked = false;
-      botaoModoAmigos.disabled = true;
-      botaoEntraSala.classList.add("hidden");
-      botaoCriarSala.classList.add("hidden");
-    } else {
-      botaoModoAmigos.disabled = false;
+  robotCheckbox.addEventListener("change", () => {
+    if (robotCheckbox.checked) {
+      // Desmarca os outros checkboxes
+      soloCheckbox.checked = false;
+      amigosCheckbox.checked = false;
+
+      // Mostra apenas as configurações de robô
+      robotSettings.classList.remove("hidden");
+      soloSettings.classList.add("hidden");
+      amigosSettings.classList.add("hidden");
     }
   });
 
-  botaoModoRobo.addEventListener("change", () => {
-    if (botaoModoSolo.checked || botaoModoRobo.checked) {
-      botaoModoAmigos.checked = false;
-      botaoModoAmigos.disabled = true;
-      botaoEntraSala.classList.add("hidden");
-      botaoCriarSala.classList.add("hidden");
-    } else {
-      botaoModoAmigos.disabled = false;
+  soloCheckbox.addEventListener("change", () => {
+    if (soloCheckbox.checked) {
+      // Desmarca os outros checkboxes
+      robotCheckbox.checked = false;
+      amigosCheckbox.checked = false;
+
+      // Mostra apenas as configurações solo
+      soloSettings.classList.remove("hidden");
+      robotSettings.classList.add("hidden");
+      amigosSettings.classList.add("hidden");
     }
   });
-  botaoEntraSala.addEventListener("click", () => {
-    codigoSala.classList.add("hidden");
-    campoCodigo.classList.remove("hidden");
-    entarSala.classList.remove("hidden");
-  });
+  // Primeiro, obtenha os elementos corretamente (adicione estas linhas no início do seu código)
+  const botaoCriarSala = document.getElementById("create-room-btn");
+  const ouText = document.querySelector(".ou-text");
+  const codigoSalaElement = document.getElementById("codigo-sala");
+  const botaoEntraSala = document.getElementById("bnt-entrarSala");
+  const campoCodigo = document.getElementById("room-code-input");
 
+  // Corrigindo o evento de clique
   botaoCriarSala.addEventListener("click", () => {
+    // Oculta os elementos relacionados ao "Entrar na Sala"
+    ouText.classList.add("hidden");
+    codigoSalaElement.classList.add("hidden");
+    botaoEntraSala.classList.add("hidden");
     campoCodigo.classList.add("hidden");
-    entarSala.classList.add("hidden");
-    codigoSala.classList.remove("hidden");
+
+    // Mostra a lista de jogadores (se necessário)
+    document.getElementById("lista-de-jogadores").classList.remove("hidden");
   });
+
+  // Lógica para marcar apenas uma caixa de seleção por vez
+  const checkboxes = [botaoModoSolo, botaoModoRobo, botaoModoAmigos];
+  checkboxes.forEach((checkbox) => {
+    checkbox.addEventListener("change", (e) => {
+      if (e.target.checked) {
+        checkboxes.forEach((cb) => {
+          if (cb !== e.target) cb.checked = false;
+        });
+      }
+    });
+  });
+
+  // Lógica de login e criação de conta
   criarConta.addEventListener("click", () => {
-    containerLogin.style.display = "flex";
-    signin.style.display = "block";
-    signup.style.display = "none";
-    alternarText.textContent = "Ainda não tem uma conta?";
-    alternarLink.textContent = "Criar conta";
+    article.style.display = "none";
+    containerLogin.style.display = "flex"; // Exibe o container de login
+    signin.style.display = "block"; // Exibe o formulário de login
+    signup.style.display = "none"; // Oculta o formulário de cadastro
+    alternarText.textContent = "Ainda não tem uma conta?"; // Atualiza o texto
+    alternarLink.textContent = "Criar conta"; // Atualiza o texto do link
   });
-  alternarLink.addEventListener("click", () => {
-    Login = !Login;
-    if (Login) {
-      signin.style.display = "block";
-      signup.style.display = "none";
-      alternarText.textContent = "Ainda não tem uma conta?";
-      alternarLink.textContent = "Criar conta";
-      containerApelido.style.display = "block";
+
+  alternarLink.addEventListener("click", (e) => {
+    e.preventDefault(); // Impede o comportamento padrão do link
+    if (signin.style.display === "block") {
+      // Se o formulário de login estiver visível
+      signin.style.display = "none"; // Oculta o formulário de login
+      signup.style.display = "block"; // Exibe o formulário de cadastro
+      alternarText.textContent = "Já tem uma conta?"; // Atualiza o texto
+      alternarLink.textContent = "Fazer login"; // Atualiza o texto do link
+      containerApelido.style.display = "none"; // Oculta o container de apelido (se houver)
     } else {
-      signup.style.display = "block";
-      signin.style.display = "none";
-      alternarText.textContent = "Já tem uma conta?";
-      alternarLink.textContent = "Fazer login";
-      containerApelido.style.display = "none";
+      // Se o formulário de cadastro estiver visível
+      signin.style.display = "block"; // Exibe o formulário de login
+      signup.style.display = "none"; // Oculta o formulário de cadastro
+      alternarText.textContent = "Ainda não tem uma conta?"; // Atualiza o texto
+      alternarLink.textContent = "Criar conta"; // Atualiza o texto do link
+      containerApelido.style.display = "block"; // Exibe o container de apelido (se houver)
     }
   });
-  alternarLinkApelido.addEventListener("click", () => {
-    Login = !Login;
-    if (Login) {
-      recuperacaoModal.style.display = "block";
-      titleLogin.style.display = "none";
-      alternarTextApelido.textContent = "Lembrei da senha!";
-      alternarLinkApelido.textContent = "Fazer login";
-      alternarContainer.style.display = "none";
+
+  alternarLinkApelido.addEventListener("click", (e) => {
+    e.preventDefault(); // Impede o comportamento padrão do link
+    if (recuperacaoModal.style.display === "none") {
+      // Se o formulário de recuperação estiver oculto
+      recuperacaoModal.style.display = "block"; // Exibe o formulário de recuperação
+      signin.style.display = "none"; // Oculta o formulário de login
+      signup.style.display = "none"; // Oculta o formulário de cadastro
+      alternarTextApelido.textContent = "Lembrei da senha!"; // Atualiza o texto
+      alternarLinkApelido.textContent = "Fazer login"; // Atualiza o texto do link
+      alternarContainer.style.display = "none"; // Oculta o container de alternância
     } else {
-      recuperacaoModal.style.display = "none";
-      titleLogin.style.display = "block";
-      alternarContainer.style.display = "block";
-      alternarText.textContent = "Ainda não tem uma conta?";
-      alternarLink.textContent = "Criar conta";
+      // Se o formulário de recuperação estiver visível
+      recuperacaoModal.style.display = "none"; // Oculta o formulário de recuperação
+      signin.style.display = "block"; // Exibe o formulário de login
+      alternarContainer.style.display = "block"; // Exibe o container de alternância
+      alternarText.textContent = "Ainda não tem uma conta?"; // Atualiza o texto
+      alternarLink.textContent = "Criar conta"; // Atualiza o texto do link
     }
   });
+
+  voltarLogin.addEventListener("click", (e) => {
+    e.preventDefault(); // Impede o comportamento padrão do link
+    recuperacaoModal.style.display = "none"; // Oculta o formulário de recuperação
+    signin.style.display = "block"; // Exibe o formulário de login
+    alternarContainer.style.display = "block"; // Exibe o container de alternância
+  });
+
   document
     .getElementById("criarConta")
     .addEventListener("click", function (event) {
@@ -271,13 +312,14 @@
           alert("Ocorreu um erro. Tente novamente.");
         });
     });
+
   document
-    .getElementById("submitBtnEntar")
+    .getElementById("submitBtnEntrar")
     .addEventListener("click", function (event) {
       event.preventDefault();
 
       const email = document.getElementById("emailEntrar").value;
-      const senha = document.getElementById("senhaEntar").value;
+      const senha = document.getElementById("senhaEntrar").value;
 
       if (!email || !senha) {
         alert("Por favor, preencha todos os campos obrigatórios.");
@@ -312,6 +354,7 @@
         });
     });
 
+  // Lógica de perfil
   document.getElementById("perfil").addEventListener("click", function (event) {
     event.preventDefault();
     const token = localStorage.getItem("authToken");
@@ -346,7 +389,7 @@
 
         // Foto e apelido
         profileHeader.querySelector("img").src =
-          data.foto || "./img/default-avatar.png";
+          data.foto || "./fotosUsuarios/default-avatar.png";
         profileHeader.querySelector("h1").textContent = data.apelido;
 
         // Estatísticas de desempenho
@@ -384,6 +427,8 @@
         alert("Ocorreu um erro ao carregar o perfil.");
       });
   });
+
+  // Lógica de recuperação de senha
   document
     .getElementById("recuperaSenha")
     .addEventListener("click", function (event) {
@@ -439,30 +484,59 @@
           button.textContent = "Recuperar Senha";
         });
     });
-  document.getElementById("create-room-btn").addEventListener("click", () => {
+
+  // Função para gerar código da sala
+  function gerarCodigoSala() {
+    const caracteres = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+    let codigo = "";
+    for (let i = 0; i < 6; i++) {
+      codigo += caracteres.charAt(
+        Math.floor(Math.random() * caracteres.length)
+      );
+    }
+    return codigo;
+  }
+
+  botaoCriarSala.addEventListener("click", () => {
     const authToken = localStorage.getItem("authToken");
     if (!authToken) {
       alert("Você precisa estar logado para criar uma sala.");
       return;
     }
 
+    // Gera o código da sala
+    const codigoSala = gerarCodigoSala();
+    console.log("Código da sala gerado:", codigoSala); // Log para depuração
+
+    // Envia o código para o backend
     fetch("/salas/criar", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${authToken}`,
       },
+      body: JSON.stringify({ codigo: codigoSala }),
     })
       .then((response) => response.json())
       .then((data) => {
+        console.log("Resposta do servidor ao criar sala:", data); // Log para depuração
         if (data.success) {
-          document.getElementById(
-            "codigo-sala"
-          ).innerHTML = `Código da Sala: <strong>${data.codigoSala}</strong>`;
+          // Exibe o código da sala para o usuário
+          codigoSalaElement.innerHTML = `Código da Sala: <strong>${codigoSala}</strong>`;
+          codigoSalaElement.classList.remove("hidden");
 
-          socket.emit("entrar-sala", { salaId: data.codigoSala });
+          // Mostra a lista de jogadores
+          document
+            .getElementById("lista-de-jogadores")
+            .classList.remove("hidden");
+
+          // Entra na sala após criá-la
+          socket.emit("entrar-sala", {
+            salaId: codigoSala,
+            usuarioId: data.usuarioId,
+          });
         } else {
-          alert("Erro ao criar a sala: " + data.error || "Desconhecido");
+          alert("Erro ao criar a sala: " + (data.error || "Desconhecido"));
         }
       })
       .catch((err) => {
@@ -471,20 +545,21 @@
       });
   });
 
-  // Entrar em uma sala
-  document.getElementById("bnt-entrarSala").addEventListener("click", () => {
-    const codigoSala = document.getElementById("room-code-input").value.trim();
+  botaoEntraSala.addEventListener("click", () => {
+    const codigoSala = campoCodigo.value.trim();
+    const authToken = localStorage.getItem("authToken");
 
     if (!codigoSala) {
       alert("Por favor, insira um código de sala.");
       return;
     }
 
-    const authToken = localStorage.getItem("authToken");
     if (!authToken) {
       alert("Você precisa estar logado para entrar em uma sala.");
       return;
     }
+
+    console.log("Código da sala enviado:", codigoSala); // Log para depuração
 
     fetch("/salas/entrar", {
       method: "POST",
@@ -496,15 +571,37 @@
     })
       .then((response) => response.json())
       .then((data) => {
+        console.log("Resposta do servidor:", data); // Log para depuração
         if (data.success) {
-          socket.emit("entrar-sala", { salaId: codigoSala });
+          document
+            .getElementById("lista-de-jogadores")
+            .classList.remove("hidden");
+
+          // Emitir evento para entrar na sala via Socket.IO
+          socket.emit("entrar-sala", {
+            salaId: codigoSala,
+            usuarioId: data.usuarioId,
+          });
         } else {
-          alert("Erro ao entrar na sala: " + data.error || "Desconhecido");
+          alert("Erro ao entrar na sala: " + (data.error || "Desconhecido"));
         }
       })
       .catch((error) => {
         console.error("Erro ao entrar na sala:", error);
         alert("Erro ao tentar entrar na sala.");
       });
+  });
+  const socket = io("http://localhost:5000");
+
+  socket.on("atualizar-jogadores", (data) => {
+    const { jogadores } = data;
+    const listaJogadores = document.getElementById("jogadores-lista");
+    listaJogadores.innerHTML = ""; // Limpa a lista atual
+
+    jogadores.forEach((jogador) => {
+      const item = document.createElement("li");
+      item.textContent = `Jogador: ${jogador.nome}`;
+      listaJogadores.appendChild(item);
+    });
   });
 })();

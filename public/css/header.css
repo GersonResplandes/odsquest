@@ -1,0 +1,115 @@
+/* Estilos básicos para o header */
+header {
+  background-color: #000; /* Fundo preto */
+  color: #fff; /* Texto branco */
+  padding: 10px 20px; /* Espaçamento interno */
+  position: sticky; /* Fixa o header no topo ao rolar a página */
+  top: 0;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Sombra sutil para dar profundidade */
+}
+
+/* Container da navbar */
+.navbar {
+  display: flex;
+  justify-content: space-between; /* Alinha os itens à esquerda e à direita */
+  align-items: center; /* Centraliza verticalmente */
+  max-width: 1200px; /* Limita a largura máxima */
+  margin: 0 auto; /* Centraliza horizontalmente */
+}
+
+/* Logo */
+.navbar .logo {
+  font-size: 24px; /* Tamanho maior para o logo */
+  font-weight: bold; /* Texto em negrito */
+  color: #00bcd4; /* Cor azul clara para destacar */
+  text-transform: uppercase; /* Transforma o texto em maiúsculas */
+  letter-spacing: 1px; /* Espaçamento entre letras */
+}
+
+/* Ícone do menu (para dispositivos móveis) */
+.menu-icon {
+  display: none; /* Esconde por padrão (visível apenas em mobile) */
+  flex-direction: column;
+  justify-content: space-between;
+  width: 30px;
+  height: 22px;
+  cursor: pointer;
+}
+
+.menu-icon div {
+  background-color: white;
+  height: 4px;
+  border-radius: 2px;
+  transition: transform 0.3s ease, opacity 0.3s ease; /* Transição suave */
+}
+
+/* Efeito de "X" ao clicar no menu */
+.menu-icon.active div:nth-child(1) {
+  transform: rotate(45deg) translate(5px, 5px);
+}
+
+.menu-icon.active div:nth-child(2) {
+  opacity: 0;
+}
+
+.menu-icon.active div:nth-child(3) {
+  transform: rotate(-45deg) translate(5px, -5px);
+}
+
+/* Links de navegação */
+.nav-links {
+  list-style: none;
+  display: flex;
+  gap: 20px; /* Espaçamento entre os links */
+  align-items: center;
+}
+
+.nav-links li {
+  text-align: center;
+}
+
+.nav-links a {
+  color: white;
+  text-decoration: none;
+  font-size: 18px;
+  transition: color 0.3s ease; /* Transição suave para hover */
+  padding: 8px 12px; /* Espaçamento interno para melhor toque */
+  border-radius: 5px; /* Bordas arredondadas */
+}
+
+.nav-links a:hover {
+  color: #00bcd4; /* Cor azul clara ao passar o mouse */
+  background-color: rgba(
+    255,
+    255,
+    255,
+    0.1
+  ); /* Fundo sutil ao passar o mouse */
+}
+
+/* Estilos para dispositivos móveis */
+@media (max-width: 768px) {
+  .menu-icon {
+    display: flex; /* Mostra o ícone do menu em dispositivos móveis */
+  }
+
+  .nav-links {
+    display: none; /* Esconde os links por padrão em mobile */
+    flex-direction: column;
+    position: absolute;
+    top: 60px; /* Posiciona abaixo do header */
+    right: 20px;
+    background-color: #000; /* Fundo preto */
+    padding: 15px;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Sombra sutil */
+  }
+
+  .nav-links.visible {
+    display: flex; /* Mostra os links quando o menu é ativado */
+  }
+
+  .nav-links li {
+    margin: 10px 0; /* Espaçamento entre os itens */
+  }
+}

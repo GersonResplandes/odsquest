@@ -1,0 +1,71 @@
+aside {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#conteiner {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  justify-content: center;
+  align-items: center;
+  height: 90%;
+  width: 80%;
+  box-shadow: 10px 10px 0px #000;
+}
+#conteiner:hover {
+  transform: translate(-10px, -20px); /* Move o elemento suavemente */
+  box-shadow: 20px 30px 30px #000;
+}
+.roleta-container {
+  position: relative;
+  width: 60px;
+  height: 60px;
+}
+
+.roleta {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+}
+
+.square {
+  position: absolute;
+  width: 60px;
+  height: 60px;
+  background-color: rgba(255, 192, 203, 0.8);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transform-origin: center;
+  transition: transform 0.5s linear;
+  overflow: hidden;
+}
+
+.square:nth-child(even) {
+  background-color: rgba(173, 216, 230, 0.8);
+}
+#circle-img {
+  width: 90%;
+  height: 90%;
+  object-fit: cover;
+}
+.square img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.center-circle {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 300px;
+  height: 300px;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}

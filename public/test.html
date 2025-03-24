@@ -1,0 +1,1096 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jogo Educativo ODS</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f0f8ff;
+            margin: 0;
+            padding: 20px;
+        }
+        
+        .tabuleiro {
+            display: grid;
+            grid-template-columns: repeat(10, 1fr);
+            grid-template-rows: repeat(10, 1fr);
+            gap: 5px;
+            width: 800px;
+            height: 800px;
+            margin: 0 auto;
+            position: relative;
+        }
+        
+        .item {
+            background-color: #e0e0e0;
+            border-radius: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            position: relative;
+        }
+        
+        .inicio {
+            background-color: #4CAF50;
+            color: white;
+        }
+        
+        .fim {
+            background-color: #f44336;
+            color: white;
+        }
+        
+        .coringa {
+            background-color: #FFC107;
+        }
+        
+        .agenda20301 {
+            background-color: #E91E63;
+            color: white;
+        }
+        
+        .agenda20302 {
+            background-color: #3F51B5;
+            color: white;
+        }
+        
+        .agenda20303 {
+            background-color: #009688;
+            color: white;
+        }
+        
+        .pawn {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            position: absolute;
+            z-index: 10;
+            transition: all 0.5s ease;
+        }
+        
+        .red {
+            background-color: #f44336;
+        }
+        
+        .blue {
+            background-color: #2196F3;
+        }
+        
+        .green {
+            background-color: #4CAF50;
+        }
+        
+        .yellow {
+            background-color: #FFEB3B;
+        }
+        
+        #container-dado {
+            width: 100px;
+            height: 100px;
+            margin: 20px auto;
+            perspective: 1000px;
+            cursor: pointer;
+        }
+        
+        #cubo {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            transform-style: preserve-3d;
+            transition: transform 1s;
+        }
+        
+        .face {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(255, 255, 255, 0.8);
+            border: 2px solid #333;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            font-weight: bold;
+        }
+        
+        .face-1 { transform: rotateY(0deg) translateZ(50px); }
+        .face-2 { transform: rotateY(90deg) translateZ(50px); }
+        .face-3 { transform: rotateY(180deg) translateZ(50px); }
+        .face-4 { transform: rotateY(-90deg) translateZ(50px); }
+        .face-5 { transform: rotateX(90deg) translateZ(50px); }
+        .face-6 { transform: rotateX(-90deg) translateZ(50px); }
+        
+        #perguntas {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.2);
+            z-index: 1000;
+            width: 80%;
+            max-width: 600px;
+        }
+        
+        #perguntas.bloqueado {
+            opacity: 0.7;
+            pointer-events: none;
+        }
+        
+        .alternativa {
+            margin: 10px 0;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        
+        .alternativa:hover {
+            background-color: #f0f0f0;
+        }
+        
+        .destaque-robô {
+            background-color: #2196F3 !important;
+            color: white !important;
+        }
+        
+        #cronometro {
+            font-size: 1.5rem;
+            text-align: center;
+            margin: 10px 0;
+            font-family: monospace;
+        }
+        
+        .presente {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .container {
+            position: relative;
+            width: 200px;
+            height: 200px;
+        }
+        
+        .caixa {
+            width: 200px;
+            height: 150px;
+            background-color: #E91E63;
+            position: relative;
+            cursor: pointer;
+        }
+        
+        .tampa {
+            width: 200px;
+            height: 50px;
+            background-color: #C2185B;
+            position: absolute;
+            top: -50px;
+            transform-origin: bottom center;
+            transition: transform 0.5s ease-in-out;
+        }
+        
+        #indicador-turno {
+            text-align: center;
+            font-size: 1.5rem;
+            margin: 20px 0;
+            padding: 10px;
+            background-color: #333;
+            color: white;
+            border-radius: 5px;
+        }
+        
+        #botao-dado {
+            display: block;
+            margin: 20px auto;
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 1rem;
+            cursor: pointer;
+        }
+        
+        #botao-dado:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+        }
+    </style>
+</head>
+<body>
+    <div id="indicador-turno">Turno: Seu turno</div>
+    
+    <div class="tabuleiro" id="tabuleiro">
+        <!-- Tabuleiro será gerado via JavaScript -->
+    </div>
+    
+    <button id="botao-dado" onclick="jogarDado()">Lançar Dado</button>
+    
+    <div id="container-dado">
+        <div id="cubo">
+            <div class="face face-1">1</div>
+            <div class="face face-2">2</div>
+            <div class="face face-3">3</div>
+            <div class="face face-4">4</div>
+            <div class="face face-5">5</div>
+            <div class="face face-6">6</div>
+        </div>
+    </div>
+    
+    <div class="presente">
+        <div class="container">
+            <div class="tampa"></div>
+            <div class="caixa"></div>
+        </div>
+    </div>
+    
+    <div id="perguntas">
+        <h2>Pergunta:</h2>
+        <p id="pergunta-texto"></p>
+        <div id="alternativas">
+            <div class="alternativa">
+                <input type="radio" name="alternativa" id="alternativaA" value="0" disabled>
+                <label for="alternativaA" id="labelA"></label>
+            </div>
+            <div class="alternativa">
+                <input type="radio" name="alternativa" id="alternativaB" value="1" disabled>
+                <label for="alternativaB" id="labelB"></label>
+            </div>
+            <div class="alternativa">
+                <input type="radio" name="alternativa" id="alternativaC" value="2" disabled>
+                <label for="alternativaC" id="labelC"></label>
+            </div>
+            <div class="alternativa">
+                <input type="radio" name="alternativa" id="alternativaD" value="3" disabled>
+                <label for="alternativaD" id="labelD"></label>
+            </div>
+        </div>
+        <div id="cronometro">00:00:000</div>
+        <button id="enviarResposta">Enviar Resposta</button>
+    </div>
+
+    <script>
+        // Banco de perguntas
+        const quiz = {
+            facil: [
+                {
+                    texto: "Qual é o objetivo principal da ODS 1 (Erradicação da Pobreza)?",
+                    alternativas: [
+                        "Acabar com a pobreza em todas as suas formas, em todos os lugares",
+                        "Reduzir pela metade o número de pessoas vivendo na pobreza",
+                        "Fornecer ajuda financeira temporária para pessoas pobres",
+                        "Criar mais empregos para pessoas de baixa renda"
+                    ],
+                    correta: 0,
+                    nivel: "facil",
+                    ods: 1
+                },
+                {
+                    texto: "Qual destes é um objetivo da ODS 2 (Fome Zero)?",
+                    alternativas: [
+                        "Acabar com todas as formas de desnutrição",
+                        "Distribuir comida gratuita para todos",
+                        "Reduzir o consumo de carne",
+                        "Aumentar a produção de fast food"
+                    ],
+                    correta: 0,
+                    nivel: "facil",
+                    ods: 2
+                }
+            ],
+            medio: [
+                {
+                    texto: "Como a ODS 3 (Saúde e Bem-Estar) pretende reduzir a mortalidade materna?",
+                    alternativas: [
+                        "Melhorando o acesso a serviços de saúde qualificados",
+                        "Fornecendo suplementos vitamínicos",
+                        "Aumentando o número de hospitais",
+                        "Reduzindo os preços dos medicamentos"
+                    ],
+                    correta: 0,
+                    nivel: "medio",
+                    ods: 3
+                }
+            ],
+            dificil: [
+                {
+                    texto: "Qual é a meta 4.7 da ODS 4 (Educação de Qualidade)?",
+                    alternativas: [
+                        "Garantir que todos adquiram conhecimentos para promover o desenvolvimento sustentável",
+                        "Construir mais escolas em áreas rurais",
+                        "Fornecer laptops para todos os estudantes",
+                        "Aumentar o salário dos professores"
+                    ],
+                    correta: 0,
+                    nivel: "dificil",
+                    ods: 4
+                }
+            ]
+        };
+
+        // Classe para gerenciar perguntas
+        class Perguntas {
+            constructor(bancoPerguntas) {
+                this.banco = bancoPerguntas;
+                this.perguntasUsadas = [];
+            }
+
+            sortearPergunta(ods) {
+                // Filtra perguntas por ODS se for um número (casas normais)
+                let poolPerguntas = [];
+                
+                if (typeof ods === 'number') {
+                    for (const nivel in this.banco) {
+                        poolPerguntas.push(...this.banco[nivel].filter(p => p.ods === ods));
+                    }
+                } else {
+                    // Para casas especiais, pega qualquer pergunta
+                    for (const nivel in this.banco) {
+                        poolPerguntas.push(...this.banco[nivel]);
+                    }
+                }
+
+                // Remove perguntas já usadas
+                poolPerguntas = poolPerguntas.filter(p => !this.perguntasUsadas.includes(p.texto));
+
+                if (poolPerguntas.length === 0) {
+                    // Se não houver perguntas disponíveis, reseta as usadas
+                    this.perguntasUsadas = [];
+                    for (const nivel in this.banco) {
+                        poolPerguntas.push(...this.banco[nivel]);
+                    }
+                }
+
+                // Sorteia uma pergunta
+                const perguntaSorteada = poolPerguntas[Math.floor(Math.random() * poolPerguntas.length)];
+                this.perguntasUsadas.push(perguntaSorteada.texto);
+                
+                return perguntaSorteada;
+            }
+        }
+
+        // Função para obter os parâmetros da URL
+        function obterParametro(nome) {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get(nome);
+        }
+        const modoSelecionado = obterParametro("modo") || "solo";
+
+        // Inicialização do jogo
+        function inicializarJogo() {
+            const tabuleiro = document.getElementById('tabuleiro');
+            
+            // Cria as casas do tabuleiro
+            for (let i = 0; i < 100; i++) {
+                const casa = document.createElement('div');
+                casa.className = 'item';
+                casa.textContent = i + 1;
+                
+                // Define casas especiais
+                if (i === 0) {
+                    casa.className += ' inicio';
+                } else if (i === 99) {
+                    casa.className += ' fim';
+                } else if (i % 7 === 0) {
+                    casa.className += ' coringa';
+                } else if (i === 18) {
+                    casa.className += ' agenda20301';
+                } else if (i === 32) {
+                    casa.className += ' agenda20302';
+                } else if (i === 56) {
+                    casa.className += ' agenda20303';
+                }
+                
+                tabuleiro.appendChild(casa);
+            }
+            
+            // Adiciona peões
+            const peaoVermelho = document.createElement('div');
+            peaoVermelho.className = 'pawn red';
+            tabuleiro.appendChild(peaoVermelho);
+            
+            const peaoAzul = document.createElement('div');
+            peaoAzul.className = 'pawn blue';
+            tabuleiro.appendChild(peaoAzul);
+            
+            const peaoVerde = document.createElement('div');
+            peaoVerde.className = 'pawn green';
+            tabuleiro.appendChild(peaoVerde);
+            
+            const peaoAmarelo = document.createElement('div');
+            peaoAmarelo.className = 'pawn yellow';
+            tabuleiro.appendChild(peaoAmarelo);
+            
+            // Configura modo de jogo
+            if (modoSelecionado === "solo") {
+                peaoAzul.style.display = "none";
+                peaoVerde.style.display = "none";
+                peaoAmarelo.style.display = "none";
+            } else if (modoSelecionado === "robot") {
+                peaoVerde.style.display = "none";
+                peaoAmarelo.style.display = "none";
+            }
+            
+            // Posiciona peões no início
+            const inicio = document.querySelector('.inicio');
+            const estilo = window.getComputedStyle(inicio);
+            
+            peaoVermelho.style.gridColumn = estilo.gridColumn;
+            peaoVermelho.style.gridRow = estilo.gridRow;
+            
+            peaoAzul.style.gridColumn = estilo.gridColumn;
+            peaoAzul.style.gridRow = estilo.gridRow;
+            
+            peaoVerde.style.gridColumn = estilo.gridColumn;
+            peaoVerde.style.gridRow = estilo.gridRow;
+            
+            peaoAmarelo.style.gridColumn = estilo.gridColumn;
+            peaoAmarelo.style.gridRow = estilo.gridRow;
+        }
+
+        // Variáveis de estado do jogo
+        let dadoAtivo = true;
+        let jogadorAtual = "usuario";
+        let posicaoUsuario = 0;
+        let posicaoRobo = 0;
+        let posicaoUsuarioAnterior = 0;
+        let posicaoRoboAnterior = 0;
+        let tempoRestante;
+        let intervaloCronometro;
+        let jogadoresHumanos = [];
+        let indiceJogadorAtual = 0;
+        
+        const marcadorUsuario = document.querySelector(".pawn.red");
+        const marcadorRobo = document.querySelector(".pawn.blue");
+        const marcadorJogador2 = document.querySelector(".pawn.green");
+        const marcadorJogador3 = document.querySelector(".pawn.yellow");
+        const posicoes = document.querySelectorAll(".item");
+        const perguntasQuiz = new Perguntas(quiz);
+        const enviarRespostaBtn = document.getElementById("enviarResposta");
+        const alternativasInputs = document.querySelectorAll('input[name="alternativa"]');
+        const labelsAlternativas = [
+            document.getElementById("labelA"),
+            document.getElementById("labelB"),
+            document.getElementById("labelC"),
+            document.getElementById("labelD")
+        ];
+
+        // Inicializa o jogo quando o DOM estiver carregado
+        document.addEventListener('DOMContentLoaded', () => {
+            inicializarJogo();
+            atualizarInterfaceTurno();
+            
+            // Configura evento de enviar resposta
+            enviarRespostaBtn.addEventListener('click', () => {
+                const respostaSelecionada = document.querySelector('input[name="alternativa"]:checked');
+                const perguntaAtual = document.getElementById('perguntas').dataset.pergunta;
+                
+                if (perguntaAtual) {
+                    const pergunta = JSON.parse(perguntaAtual);
+                    verificarResposta(pergunta, "usuario", respostaSelecionada ? parseInt(respostaSelecionada.value) : null);
+                    pararCronometro();
+                }
+            });
+        });
+
+        function rolarDado() {
+            const numeroGerado = Math.floor(Math.random() * 6) + 1;
+            const randomX = Math.floor(Math.random() * 4) * 360;
+            const randomY = Math.floor(Math.random() * 4) * 360;
+            const cubo = document.getElementById("cubo");
+            cubo.style.transform = `rotateX(${randomX}deg) rotateY(${randomY}deg)`;
+
+            setTimeout(() => {
+                let finalX = randomX;
+                let finalY = randomY;
+
+                switch (numeroGerado) {
+                    case 1:
+                        break;
+                    case 2:
+                        finalY -= 90;
+                        break;
+                    case 3:
+                        finalY -= 180;
+                        break;
+                    case 4:
+                        finalY += 90;
+                        break;
+                    case 5:
+                        finalX -= 90;
+                        break;
+                    case 6:
+                        finalX += 90;
+                        break;
+                }
+
+                cubo.style.transition = "transform 2s ease-in-out";
+                cubo.style.transform = `rotateX(${finalX}deg) rotateY(${finalY}deg)`;
+            }, 1000);
+
+            return numeroGerado;
+        }
+
+        function moverJogador(dadoResultado) {
+            let marcador;
+            let novaPosicao;
+
+            if (jogadorAtual === "usuario") {
+                marcador = marcadorUsuario;
+                posicaoUsuarioAnterior = posicaoUsuario;
+                novaPosicao = Math.min(
+                    posicaoUsuarioAnterior + dadoResultado,
+                    posicoes.length - 1
+                );
+                posicaoUsuario = novaPosicao;
+            } else if (jogadorAtual === "robo") {
+                marcador = marcadorRobo;
+                posicaoRoboAnterior = posicaoRobo;
+                novaPosicao = Math.min(
+                    posicaoRoboAnterior + dadoResultado,
+                    posicoes.length - 1
+                );
+                posicaoRobo = novaPosicao;
+            } else if (jogadorAtual === "jogador2") {
+                marcador = marcadorJogador2;
+                // Lógica similar para jogador 2
+            } else if (jogadorAtual === "jogador3") {
+                marcador = marcadorJogador3;
+                // Lógica similar para jogador 3
+            }
+
+            const elemento = posicoes[novaPosicao];
+            const classeElemento = elemento.className;
+
+            if (elemento) {
+                setTimeout(() => {
+                    const estilo = window.getComputedStyle(elemento);
+                    marcador.style.gridColumn = estilo.gridColumn;
+                    marcador.style.gridRow = estilo.gridRow;
+
+                    // Verifica se o jogo terminou
+                    if (verificarFimDeJogo()) return;
+
+                    // Verificar se parou em casa especial
+                    if (classeElemento.includes("coringa")) {
+                        exibirModalCoringa(jogadorAtual, novaPosicao, marcador);
+                    } else if (classeElemento.includes("agenda2030")) {
+                        exibirPerguntaEspecial(jogadorAtual, novaPosicao, marcador);
+                    } else {
+                        // Caso normal - exibir pergunta padrão
+                        const ods = parseInt(classeElemento.match(/agenda2030(\d)/)?.[1]) || 
+                                   Math.floor(Math.random() * 17) + 1; // ODS aleatório se não for casa especial
+                        exibirPergunta(jogadorAtual, ods, marcador);
+                    }
+                }, 3000);
+            }
+        }
+
+        function verificarFimDeJogo() {
+            if (posicaoUsuario >= posicoes.length - 1) {
+                alert("Parabéns! Você venceu o jogo!");
+                reiniciarJogo();
+                return true;
+            }
+            if (posicaoRobo >= posicoes.length - 1) {
+                alert("O robô venceu o jogo!");
+                reiniciarJogo();
+                return true;
+            }
+            // Verificar outros jogadores no modo multiplayer
+            return false;
+        }
+
+        function reiniciarJogo() {
+            // Retorna todos os peões ao início
+            const inicio = document.querySelector('.inicio');
+            const estilo = window.getComputedStyle(inicio);
+            
+            marcadorUsuario.style.gridColumn = estilo.gridColumn;
+            marcadorUsuario.style.gridRow = estilo.gridRow;
+            
+            marcadorRobo.style.gridColumn = estilo.gridColumn;
+            marcadorRobo.style.gridRow = estilo.gridRow;
+            
+            if (marcadorJogador2) {
+                marcadorJogador2.style.gridColumn = estilo.gridColumn;
+                marcadorJogador2.style.gridRow = estilo.gridRow;
+            }
+            
+            if (marcadorJogador3) {
+                marcadorJogador3.style.gridColumn = estilo.gridColumn;
+                marcadorJogador3.style.gridRow = estilo.gridRow;
+            }
+            
+            // Reseta posições
+            posicaoUsuario = 0;
+            posicaoRobo = 0;
+            posicaoUsuarioAnterior = 0;
+            posicaoRoboAnterior = 0;
+            
+            // Reseta turno
+            jogadorAtual = "usuario";
+            dadoAtivo = true;
+            atualizarInterfaceTurno();
+        }
+
+        function jogarDado() {
+            if (dadoAtivo) {
+                dadoAtivo = false;
+                document.getElementById('botao-dado').disabled = true;
+                const resultado = rolarDado();
+                console.log(`Dado rolado: ${resultado}`);
+                moverJogador(resultado);
+
+                setTimeout(() => {
+                    dadoAtivo = true;
+                    document.getElementById('botao-dado').disabled = false;
+                }, 4500);
+            }
+        }
+
+        function exibirPerguntaEspecial(jogador, posicao, marcador) {
+            // Determinar qual casa especial (1, 2 ou 3)
+            const casaEspecial = posicoes[posicao].className.match(/agenda2030(\d)/)[1];
+
+            // Mapear casa especial para ODS correspondente
+            const odsMap = {
+                1: 1, // agenda20301 → ODS 1
+                2: 2, // agenda20302 → ODS 2
+                3: 3  // agenda20303 → ODS 3
+            };
+
+            const ods = odsMap[casaEspecial];
+
+            // Exibir pergunta especial
+            exibirPergunta(jogador, ods, marcador);
+        }
+
+        function atualizarPosicao(marcador, posicao) {
+            const elemento = posicoes[posicao];
+            if (elemento) {
+                const estilo = window.getComputedStyle(elemento);
+                marcador.style.gridColumn = estilo.gridColumn;
+                marcador.style.gridRow = estilo.gridRow;
+            }
+        }
+
+        function exibirModalCoringa(jogador, valorDado, marcador) {
+            // Elementos do DOM
+            const presente = document.querySelector(".presente");
+            const container = document.querySelector(".container");
+            const caixa = document.querySelector(".caixa");
+            const tampa = document.querySelector(".tampa");
+
+            // Criação do fundo escuro
+            const escurecer = document.createElement("div");
+            escurecer.id = "escurecer";
+            escurecer.style.position = "fixed";
+            escurecer.style.top = "0";
+            escurecer.style.left = "0";
+            escurecer.style.width = "100%";
+            escurecer.style.height = "100%";
+            escurecer.style.backgroundColor = "rgba(0, 0, 0, 0.7)";
+            escurecer.style.zIndex = "1000";
+            escurecer.style.display = "block";
+            document.body.appendChild(escurecer);
+
+            // Configuração do presente
+            presente.style.display = "flex";
+            presente.style.position = "fixed";
+            presente.style.top = "50%";
+            presente.style.left = "50%";
+            presente.style.transform = "translate(-50%, -50%)";
+            presente.style.zIndex = "1001";
+
+            // Cria e configura a mensagem
+            const mensagem = document.createElement("div");
+            mensagem.id = "mensagem-presente";
+            mensagem.style.position = "absolute";
+            mensagem.style.bottom = "-50px";
+            mensagem.style.width = "100%";
+            mensagem.style.textAlign = "center";
+            mensagem.style.fontFamily = "Arial, sans-serif";
+            mensagem.style.fontWeight = "bold";
+            mensagem.style.fontSize = "1.2rem";
+            mensagem.style.color = "white";
+            mensagem.style.textShadow = "1px 1px 2px black";
+            mensagem.style.display = "none";
+            presente.appendChild(mensagem);
+
+            // Sorteia o resultado (-3, -2, -1, 1, 2, 3)
+            const resultado = Math.floor(Math.random() * 6) - 3; // Números de -3 a 2
+            const resultadoFinal = resultado === 0 ? 3 : resultado; // Se for 0, vira 3 (avança 3)
+
+            const abrirPresente = () => {
+                // Abre a tampa
+                tampa.style.transform = "rotate(-15deg) translateY(-3rem)";
+
+                // Define a mensagem conforme o resultado
+                let mensagemTexto = "";
+                if (resultadoFinal < 0) {
+                    mensagemTexto = `Volte ${Math.abs(resultadoFinal)} casa${
+                        Math.abs(resultadoFinal) > 1 ? "s" : ""
+                    }!`;
+                } else {
+                    mensagemTexto = `Avance ${resultadoFinal} casa${
+                        resultadoFinal > 1 ? "s" : ""
+                    }!`;
+                }
+
+                mensagem.textContent = mensagemTexto;
+                mensagem.style.display = "block";
+
+                // Fecha após 2 segundos e aplica as consequências
+                setTimeout(() => {
+                    tampa.style.transform = "";
+                    mensagem.style.display = "none";
+
+                    // Delay antes de esconder o fundo e aplicar as consequências
+                    setTimeout(() => {
+                        escurecer.style.display = "none";
+                        presente.style.display = "none";
+
+                        // Remove o presente do DOM após uso
+                        setTimeout(() => {
+                            document.body.removeChild(escurecer);
+                            presente.removeChild(mensagem);
+                        }, 500);
+
+                        // Aplica as consequências do resultado após mais um delay
+                        setTimeout(() => {
+                            let novaPosicao;
+                            if (jogador === "usuario") {
+                                novaPosicao = Math.max(0, posicaoUsuario + resultadoFinal);
+                                posicaoUsuarioAnterior = posicaoUsuario;
+                                posicaoUsuario = novaPosicao;
+                            } else if (jogador === "robo") {
+                                novaPosicao = Math.max(0, posicaoRobo + resultadoFinal);
+                                posicaoRoboAnterior = posicaoRobo;
+                                posicaoRobo = novaPosicao;
+                            }
+
+                            atualizarPosicao(marcador, novaPosicao);
+
+                            // Se avançou, exibe pergunta; se voltou, troca turno
+                            if (resultadoFinal > 0) {
+                                setTimeout(() => {
+                                    const elemento = posicoes[novaPosicao];
+                                    const classeElemento = elemento.className;
+                                    const ods = parseInt(classeElemento.match(/agenda2030(\d)/)?.[1]) || 
+                                               Math.floor(Math.random() * 17) + 1;
+                                    exibirPergunta(jogador, ods, marcador);
+                                }, 500);
+                            } else {
+                                setTimeout(() => {
+                                    trocarTurno();
+                                }, 500);
+                            }
+                        }, 500);
+                    }, 1000); // Tempo que a mensagem fica visível após fechar a tampa
+                }, 2000); // Tempo que a tampa fica aberta
+            };
+
+            // Comportamento diferente para usuário e robô
+            if (jogador === "robo") {
+                // Robô: espera 1s, abre o presente, e todo o processo ocorre com delays
+                setTimeout(() => {
+                    abrirPresente();
+                }, 1000);
+            } else {
+                // Usuário: abre ao clicar
+                caixa.addEventListener("click", abrirPresente, { once: true });
+            }
+        }
+
+        function exibirPergunta(respondente, ods, marcador) {
+            const perguntaSorteada = perguntasQuiz.sortearPergunta(ods);
+            const perguntasContainer = document.getElementById("perguntas");
+            
+            if (!perguntaSorteada) {
+                console.error("Nenhuma pergunta disponível para ODS", ods);
+                trocarTurno();
+                return;
+            }
+
+            // Armazena a pergunta atual no dataset para referência posterior
+            perguntasContainer.dataset.pergunta = JSON.stringify(perguntaSorteada);
+
+            // Configuração inicial
+            perguntasContainer.style.display = "block";
+            document.getElementById("pergunta-texto").textContent = perguntaSorteada.texto;
+
+            // Limpar seleções anteriores
+            alternativasInputs.forEach((input) => {
+                input.checked = false;
+                input.disabled = false;
+            });
+
+            labelsAlternativas.forEach(label => {
+                label.classList.remove("destaque-robô");
+            });
+
+            // Preencher alternativas
+            for (let i = 0; i < 4; i++) {
+                labelsAlternativas[i].textContent = perguntaSorteada.alternativas[i] || "";
+            }
+
+            // Configurar cronômetro
+            iniciarCronometro(
+                perguntaSorteada.nivel,
+                respondente === "usuario" ? posicaoUsuarioAnterior : posicaoRoboAnterior,
+                marcador,
+                respondente,
+                perguntaSorteada
+            );
+
+            if (respondente === "robo") {
+                // BLOQUEAR INTERAÇÃO DO USUÁRIO
+                perguntasContainer.classList.add("bloqueado");
+                alternativasInputs.forEach((input) => (input.disabled = true));
+                enviarRespostaBtn.disabled = true;
+
+                // Lógica de resposta do robô
+                const tempoPensamento = {
+                    facil: 3000,
+                    medio: 2000,
+                    dificil: 1000
+                };
+
+                setTimeout(() => {
+                    // Calcular resposta do robô
+                    const indiceEscolhido = calcularRespostaRobo(perguntaSorteada);
+
+                    // Marcar alternativa visualmente
+                    alternativasInputs[indiceEscolhido].checked = true;
+                    labelsAlternativas[indiceEscolhido].classList.add("destaque-robô");
+
+                    // Esperar e enviar resposta
+                    setTimeout(() => {
+                        verificarResposta(perguntaSorteada, "robo", indiceEscolhido);
+                        pararCronometro();
+
+                        // RESTAURAR INTERAÇÃO DO USUÁRIO
+                        perguntasContainer.classList.remove("bloqueado");
+                        alternativasInputs.forEach((input) => (input.disabled = false));
+                        labelsAlternativas[indiceEscolhido].classList.remove("destaque-robô");
+                    }, 1500);
+                }, tempoPensamento[perguntaSorteada.nivel]);
+            } else {
+                // Configuração para jogador humano
+                alternativasInputs.forEach((input) => (input.disabled = false));
+                enviarRespostaBtn.disabled = false;
+            }
+        }
+
+        // Função auxiliar para cálculo da resposta do robô
+        function calcularRespostaRobo(pergunta) {
+            const chanceAcerto = {
+                facil: 0.8,
+                medio: 0.6,
+                dificil: 0.4
+            };
+
+            const vaiAcertar = Math.random() < chanceAcerto[pergunta.nivel];
+
+            if (vaiAcertar) {
+                return pergunta.correta;
+            } else {
+                const alternativasErradas = [0, 1, 2, 3].filter(
+                    (i) => i !== pergunta.correta
+                );
+                return alternativasErradas[
+                    Math.floor(Math.random() * alternativasErradas.length)
+                ];
+            }
+        }
+
+        function verificarResposta(pergunta, respondente, indiceResposta) {
+            // Verifica se é o usuário e se não selecionou resposta
+            if (respondente === "usuario" && indiceResposta === undefined) {
+                const respostaSelecionada = document.querySelector(
+                    'input[name="alternativa"]:checked'
+                );
+                if (!respostaSelecionada) {
+                    alert("Por favor, selecione uma resposta!");
+                    return;
+                }
+                indiceResposta = parseInt(respostaSelecionada.value);
+            }
+
+            // Verifica se acertou comparando com o índice da pergunta
+            const acertou = indiceResposta === pergunta.correta;
+
+            // Mostra alerta simples
+            alert(acertou ? "Resposta correta!" : "Resposta incorreta!");
+
+            // Lógica de movimentação
+            if (!acertou) {
+                if (respondente === "usuario") {
+                    posicaoUsuario = posicaoUsuarioAnterior;
+                    atualizarPosicao(marcadorUsuario, posicaoUsuario);
+                } else if (respondente === "robo") {
+                    posicaoRobo = posicaoRoboAnterior;
+                    atualizarPosicao(marcadorRobo, posicaoRobo);
+                }
+            }
+
+            // Esconde a pergunta e troca de turno
+            document.getElementById("perguntas").style.display = "none";
+            trocarTurno();
+        }
+
+        function trocarTurno() {
+            switch (modoSelecionado) {
+                case "solo":
+                    // No modo solo, não há troca de turno - sempre é o jogador
+                    dadoAtivo = true;
+                    break;
+
+                case "robot":
+                    // No modo contra robô, alterna entre jogador e robô
+                    jogadorAtual = jogadorAtual === "usuario" ? "robo" : "usuario";
+
+                    if (jogadorAtual === "robo") {
+                        dadoAtivo = false;
+                        setTimeout(() => {
+                            const resultado = rolarDado();
+                            moverJogador(resultado);
+                        }, 1000);
+                    } else {
+                        dadoAtivo = true;
+                    }
+                    break;
+
+                case "amigos":
+                    // No modo multiplayer, alterna entre jogadores humanos
+                    jogadorAtual = proximoJogadorHumano();
+                    dadoAtivo = true;
+                    break;
+
+                default:
+                    console.error("Modo de jogo desconhecido:", modoSelecionado);
+                    dadoAtivo = true;
+            }
+
+            // Atualiza a interface conforme o jogador atual
+            atualizarInterfaceTurno();
+        }
+
+        function proximoJogadorHumano() {
+            if (jogadoresHumanos.length === 0) {
+                jogadoresHumanos = ["usuario", "jogador2", "jogador3"];
+            }
+            
+            indiceJogadorAtual = (indiceJogadorAtual + 1) % jogadoresHumanos.length;
+            return jogadoresHumanos[indiceJogadorAtual];
+        }
+
+        function atualizarInterfaceTurno() {
+            // Atualiza a UI para mostrar de quem é a vez
+            const elementoTurno = document.getElementById("indicador-turno");
+            if (elementoTurno) {
+                let texto = "";
+                switch (jogadorAtual) {
+                    case "usuario":
+                        texto = "Seu turno";
+                        break;
+                    case "robo":
+                        texto = "Turno do robô";
+                        break;
+                    case "jogador2":
+                        texto = "Turno do Jogador 2";
+                        break;
+                    case "jogador3":
+                        texto = "Turno do Jogador 3";
+                        break;
+                    default:
+                        texto = "Turno desconhecido";
+                }
+                elementoTurno.textContent = `Turno: ${texto}`;
+            }
+
+            // Habilita/desabilita o dado conforme necessário
+            const botaoDado = document.getElementById("botao-dado");
+            if (botaoDado) {
+                botaoDado.disabled = !dadoAtivo || jogadorAtual !== "usuario";
+            }
+        }
+
+        function iniciarCronometro(nivel, posicaoAnterior, marcador, respondente, pergunta) {
+            const cronometro = document.getElementById("cronometro");
+            
+            // Define o tempo baseado no nível da pergunta
+            if (nivel === "facil") {
+                tempoRestante = 25000;
+            } else if (nivel === "medio") {
+                tempoRestante = 20000;
+            } else if (nivel === "dificil") {
+                tempoRestante = 15000;
+            } else {
+                console.error("Nível inválido: " + nivel);
+                return;
+            }
+            
+            atualizarCronometro(cronometro);
+            
+            intervaloCronometro = setInterval(() => {
+                if (tempoRestante > 0) {
+                    tempoRestante -= 10;
+                    atualizarCronometro(cronometro);
+                } else {
+                    clearInterval(intervaloCronometro);
+                    alert("Tempo esgotado! Você perdeu a vez.");
+                    
+                    // Volta para a posição anterior
+                    if (respondente === "usuario") {
+                        posicaoUsuario = posicaoAnterior;
+                        atualizarPosicao(marcadorUsuario, posicaoUsuario);
+                    } else if (respondente === "robo") {
+                        posicaoRobo = posicaoAnterior;
+                        atualizarPosicao(marcadorRobo, posicaoRobo);
+                    }
+                    
+                    document.getElementById("perguntas").style.display = "none";
+                    trocarTurno();
+                }
+            }, 10);
+        }
+
+        function atualizarCronometro(cronometro) {
+            const minutos = Math.floor(tempoRestante / 60000);
+            const segundos = Math.floor((tempoRestante % 60000) / 1000);
+            const milissegundos = tempoRestante % 1000;
+            
+            cronometro.textContent = `${minutos.toString().padStart(2, "0")}:${segundos
+                .toString()
+                .padStart(2, "0")}:${milissegundos.toString().padStart(3, "0")}`;
+                
+            if (tempoRestante < 10000) {
+                cronometro.style.color = "red";
+                cronometro.style.fontWeight = "bold";
+            } else if (tempoRestante < 15000) {
+                cronometro.style.color = "orange";
+            } else {
+                cronometro.style.color = "black";
+                cronometro.style.fontWeight = "normal";
+            }
+        }
+
+        function pararCronometro() {
+            if (intervaloCronometro) {
+                clearInterval(intervaloCronometro);
+            }
+        }
+    </script>
+</body>
+</html>

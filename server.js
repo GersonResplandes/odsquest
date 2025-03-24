@@ -8,19 +8,20 @@ const session = require("express-session");
 const jwt = require("jsonwebtoken");
 const nodemailer = require("nodemailer");
 const crypto = require("crypto");
-const socketIo = require("socket.io");
 const http = require("http");
+const socketIo = require("socket.io");
 
-const app = express();
-const port = 3000;
-const server = http.createServer(app);
-const io = socketIo(server);
+const app = express(); // Seu app Express
+const server = http.createServer(app); // Cria o servidor HTTP
+const io = socketIo(server); // Configura o Socket.IO
 
 const db = mysql.createPool({
-  host: process.env.DB_HOST,
-  user: process.env.DB_USER,
-  password: process.env.DB_PASSWORD,
-  database: process.env.DB_NAME,
+  host: process.env.DB_HOST || "localhost",
+  user: process.env.DB_USER || "odsquest",
+  password: process.env.DB_PASSWORD || "Arsxp0532@",
+  database: process.env.DB_NAME || "odsquest",
+  connectionLimit: 10,
+  waitForConnections: true,
 });
 
 const transporter = nodemailer.createTransport({
@@ -31,9 +32,6 @@ const transporter = nodemailer.createTransport({
   },
 });
 
-function gerarCodigoSala() {
-  return crypto.randomBytes(5).toString("base64").slice(0, 6);
-}
 app.use(express.json());
 app.use(fileUpload());
 app.use(express.static(path.join(__dirname, "public")));
@@ -306,79 +304,174 @@ app.post("/enviarCodigo", (req, res) => {
     }
   );
 });
+function authenticateToken(req, res, next) {
+  const authHeader = req.headers["authorization"];
+  const token = authHeader && authHeader.split(" ")[1];
+
+  if (!token) return res.status(401).json({ error: "Acesso negado" });
+
+  jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
+    if (err) return res.status(403).json({ error: "Token inválido" });
+    req.user = user;
+    next();
+  });
+}
+
 app.post("/salas/criar", authenticateToken, (req, res) => {
   const usuarioId = req.user.id;
-  const codigoSala = Math.random().toString(36).substring(2, 8).toUpperCase();
+  const codigoSala = req.body.codigo;
+
+  console.log("Código da sala recebido para criação:", codigoSala); // Log para depuração
 
   const query = "INSERT INTO salas (codigo, criador_id) VALUES (?, ?)";
   db.query(query, [codigoSala, usuarioId], (err, result) => {
-    if (err) return res.status(500).json({ error: "Erro ao criar a sala." });
+    if (err) {
+      console.error("Erro ao criar a sala:", err);
+      return res.status(500).json({ error: "Erro ao criar a sala." });
+    }
 
+    console.log("Sala criada com sucesso:", codigoSala); // Log para depuração
+
+    // Emitir evento de sala criada
     io.emit("sala-criada", { codigoSala, criadorId: usuarioId });
-    res.status(201).json({ success: true, codigoSala });
+
+    // Retornar sucesso
+    res.status(201).json({
+      success: true,
+      codigoSala,
+      usuarioId,
+      redirectUrl: `/tabuleiro.html?modo=amigos&salaId=${codigoSala}`,
+    });
   });
 });
+
 app.post("/salas/entrar", authenticateToken, (req, res) => {
   const { codigo } = req.body;
   const usuarioId = req.user.id;
 
+  console.log("Código da sala recebido para entrar:", codigo); // Log para depuração
+
   const query = "SELECT id FROM salas WHERE codigo = ?";
   db.query(query, [codigo], (err, result) => {
-    if (err) return res.status(500).json({ error: "Erro ao buscar a sala." });
-    if (result.length === 0)
+    if (err) {
+      console.error("Erro ao buscar a sala:", err);
+      return res.status(500).json({ error: "Erro ao buscar a sala." });
+    }
+
+    console.log("Resultado da consulta:", result); // Log para depuração
+
+    if (result.length === 0) {
       return res.status(404).json({ error: "Sala não encontrada." });
+    }
 
     const salaId = result[0].id;
+
+    // Verificar se o usuário já está na sala
     const checkQuery =
       "SELECT * FROM jogadores_sala WHERE sala_id = ? AND usuario_id = ?";
     db.query(checkQuery, [salaId, usuarioId], (err, result) => {
-      if (err)
+      if (err) {
+        console.error("Erro ao verificar jogador na sala:", err);
         return res
           .status(500)
           .json({ error: "Erro ao verificar jogador na sala." });
-      if (result.length > 0)
-        return res.status(400).json({ error: "Você já está na sala." });
+      }
 
+      if (result.length > 0) {
+        return res.status(400).json({ error: "Você já está na sala." });
+      }
+
+      // Adicionar o usuário à sala
       const insertQuery =
         "INSERT INTO jogadores_sala (sala_id, usuario_id) VALUES (?, ?)";
       db.query(insertQuery, [salaId, usuarioId], (err) => {
-        if (err)
+        if (err) {
+          console.error("Erro ao entrar na sala:", err);
           return res.status(500).json({ error: "Erro ao entrar na sala." });
+        }
 
-        io.emit("atualizar-jogadores", { salaId });
-        res
-          .status(200)
-          .json({ success: true, message: "Você entrou na sala." });
+        // Emitir evento de atualização de jogadores
+        io.to(salaId).emit("atualizar-jogadores", { salaId });
+
+        // Retornar sucesso
+        res.status(200).json({
+          success: true,
+          usuarioId,
+          salaId: codigo,
+          redirectUrl: `/tabuleiro.html?modo=amigos&salaId=${codigo}`,
+        });
       });
     });
   });
 });
-app.post("/salas/finalizar", authenticateToken, (req, res) => {
-  const { codigo } = req.body;
 
-  const query = "DELETE FROM salas WHERE codigo = ?";
-  db.query(query, [codigo], (err, result) => {
-    if (err)
-      return res.status(500).json({ error: "Erro ao finalizar a sala." });
-    res.status(200).json({
-      success: true,
-      message: "Sala finalizada e removida com sucesso.",
-    });
-  });
-});
+const usuariosConectados = {}; // Mapeia socket.id -> usuarioId
+
+// Evento para o usuário entrar na sala
 io.on("connection", (socket) => {
-  console.log("Novo usuário conectado.");
+  console.log("Novo usuário conectado:", socket.id);
 
-  socket.on("entrar-sala", (data) => {
-    socket.join(data.salaId);
-    io.to(data.salaId).emit("atualizar-jogadores", data);
+  socket.on("entrar-sala", async (data) => {
+    const { salaId, usuarioId } = data;
+
+    try {
+      // Busca informações do usuário
+      const usuario = await new Promise((resolve, reject) => {
+        db.query(
+          "SELECT id, apelido FROM usuarios WHERE id = ?",
+          [usuarioId],
+          (err, result) => {
+            if (err) return reject(err);
+            resolve(result[0]);
+          }
+        );
+      });
+
+      if (!usuario) {
+        throw new Error("Usuário não encontrado");
+      }
+
+      // Entra na sala
+      socket.join(salaId);
+      usuariosConectados[socket.id] = usuario;
+
+      // Busca todos os jogadores na sala
+      const socketsInRoom = Array.from(
+        io.sockets.adapter.rooms.get(salaId) || []
+      );
+      const jogadores = socketsInRoom.map((socketId) => {
+        return (
+          usuariosConectados[socketId] || {
+            id: socketId,
+            apelido: "Desconhecido",
+          }
+        );
+      });
+
+      // Limita a 4 jogadores
+      const jogadoresLimitados = jogadores.slice(0, 4);
+
+      // Emite atualização para todos na sala
+      io.to(salaId).emit("atualizar-jogadores", {
+        salaId,
+        jogadores: jogadoresLimitados.map((j) => ({
+          id: j.id,
+          nome: j.apelido,
+        })),
+      });
+    } catch (error) {
+      console.error("Erro ao entrar na sala:", error);
+    }
   });
 
+  // Quando o usuário se desconecta
   socket.on("disconnect", () => {
-    console.log("Usuário desconectado.");
+    console.log("Usuário desconectado:", socket.id);
+    delete usuariosConectados[socket.id]; // Remove o mapeamento
   });
 });
 
-app.listen(port, () => {
-  console.log(`Servidor rodando em http://localhost:${port}`);
+// Inicia o servidor
+server.listen(process.env.PORT, () => {
+  console.log("Servidor rodando na porta");
 });

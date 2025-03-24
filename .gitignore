@@ -2,3 +2,4 @@ node_modules/
 public/fotosUsuarios/
 .env
 *.log
+package-lock.json
