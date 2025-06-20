@@ -73,7 +73,7 @@ function atualizarPosicaoMarcador(marcador, posicao) {
 // Funções do dado
 function rolarDado() {
   // const numeroGerado = Math.floor(Math.random() * 6) + 1;
-  const numeroGerado = 14;
+  const numeroGerado = Math.floor(Math.random() * 6) + 1;
   const randomX = Math.floor(Math.random() * 4) * 360;
   const randomY = Math.floor(Math.random() * 4) * 360;
   const cubo = document.getElementById("cubo");
